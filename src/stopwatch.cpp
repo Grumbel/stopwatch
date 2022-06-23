@@ -1,12 +1,14 @@
-#include <boost/format.hpp>
-#include <iostream>
-#include <stdint.h>
-#include <sys/time.h>
-#include <iostream>
 #include <errno.h>
-#include <string.h>
+#include <iostream>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <stdint.h>
+#include <string.h>
+#include <sys/time.h>
+#include <unistd.h>
+
+#include <fmt/format.h>
 
 uint64_t get_sys_time()
 {
@@ -35,12 +37,8 @@ void print_time(uint64_t time)
   int minutes  = time / microsec_to_minutes; time -= minutes * microsec_to_minutes;
   int seconds  = time / microsec_to_seconds; time -= seconds * microsec_to_seconds;
   int milisec  = time / microsec_to_milisec; time -= milisec * microsec_to_milisec;
-  //int microsec = time;
 
-  //std::cout << hours << ":" << minutes << ":" << seconds << "." << milisec << "'" << microsec << std::endl;
-
-  //std::cout << boost::format("%02d:%02d:%02d'%03d'%03d") % hours % minutes % seconds % milisec % microsec << std::endl;
-  std::cout << boost::format("Time: %02d:%02d:%02d'%03d") % hours % minutes % seconds % milisec << '\r' << std::flush;
+  std::cout << fmt::format("Time: {:02d}:{:02d}:{:02d}'{:03d}\r", hours, minutes, seconds, milisec) << std::flush;
 }
 
 int main(int argc, char** argv)

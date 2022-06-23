@@ -17,7 +17,9 @@
 cmake_minimum_required(VERSION 3.15)
 project(stopwatch)
 
+find_package(fmt REQUIRED)
 add_executable(stopwatch src/stopwatch.cpp)
+target_link_libraries(stopwatch PRIVATE fmt::fmt)
 
 install(TARGETS stopwatch)
 

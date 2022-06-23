@@ -18,7 +18,7 @@
               cmake
             ];
             buildInputs = with pkgs; [
-              boost
+              fmt
             ];
            };
         };
