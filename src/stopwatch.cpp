@@ -1,61 +1,53 @@
-#include <errno.h>
+// stopwatch - Stopwatch for the command line
+// Copyright (C) 2022 Ingo Ruhnke <grumbel@gmail.com>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#include <chrono>
 #include <iostream>
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
-#include <stdint.h>
-#include <string.h>
-#include <sys/time.h>
-#include <unistd.h>
+#include <thread>
 
 #include <fmt/format.h>
 
-uint64_t get_sys_time()
+uint64_t const microsec_to_hours    = 1000ul * 60ul * 60ul;
+uint64_t const microsec_to_minutes  = 1000ul * 60ul;
+uint64_t const microsec_to_seconds  = 1000ul;
+uint64_t const microsec_to_millisec = 1ul;
+
+void print_time(std::chrono::milliseconds usec)
 {
-  struct timeval  tv;
+  std::chrono::milliseconds::rep time = usec.count();
 
-  if (gettimeofday(&tv, NULL) < 0)
-  {
-    std::ostringstream str;
-    str << strerror(errno);
-    throw std::runtime_error(str.str());
-  }
-  else
-  {
-    return static_cast<uint64_t>(tv.tv_sec) * 1000000 + static_cast<uint64_t>(tv.tv_usec);
-  }
-}
+  int const hours    = time / microsec_to_hours;    time -= hours    * microsec_to_hours;
+  int const minutes  = time / microsec_to_minutes;  time -= minutes  * microsec_to_minutes;
+  int const seconds  = time / microsec_to_seconds;  time -= seconds  * microsec_to_seconds;
+  int const millisec = time / microsec_to_millisec; time -= millisec * microsec_to_millisec;
 
-const uint64_t microsec_to_hours   = 1000ul * 1000ul * 60ul * 60ul;
-const uint64_t microsec_to_minutes = 1000ul * 1000ul * 60ul;
-const uint64_t microsec_to_seconds = 1000ul * 1000ul;
-const uint64_t microsec_to_milisec = 1000ul;
-
-void print_time(uint64_t time)
-{
-  int hours    = time / microsec_to_hours;   time -= hours   * microsec_to_hours;
-  int minutes  = time / microsec_to_minutes; time -= minutes * microsec_to_minutes;
-  int seconds  = time / microsec_to_seconds; time -= seconds * microsec_to_seconds;
-  int milisec  = time / microsec_to_milisec; time -= milisec * microsec_to_milisec;
-
-  std::cout << fmt::format("Time: {:02d}:{:02d}:{:02d}'{:03d}\r", hours, minutes, seconds, milisec) << std::flush;
+  std::cout << fmt::format("Time: {:02d}:{:02d}:{:02d}'{:03d}\r", hours, minutes, seconds, millisec) << std::flush;
 }
 
 int main(int argc, char** argv)
 {
-  uint64_t start_time = get_sys_time();
-  uint64_t last_time = ~0ul;
+  std::chrono::steady_clock::time_point const start_time = std::chrono::steady_clock::now();
 
   while(true)
   {
-    uint64_t t = get_sys_time() - start_time;
+    auto const duration = std::chrono::steady_clock::now() - start_time;
 
-    if (t/1000 != last_time/1000)
-    {
-      print_time(t);
-      last_time = t;
-    }
-    usleep(10000);
+    print_time(std::chrono::duration_cast<std::chrono::milliseconds>(duration));
+
+    std::this_thread::sleep_until(std::chrono::steady_clock::now() + std::chrono::milliseconds(10));
   }
 
   return 0;
