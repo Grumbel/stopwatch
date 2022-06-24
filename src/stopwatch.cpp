@@ -20,19 +20,18 @@
 
 #include <fmt/format.h>
 
-uint64_t const microsec_to_hours    = 1000ul * 60ul * 60ul;
-uint64_t const microsec_to_minutes  = 1000ul * 60ul;
-uint64_t const microsec_to_seconds  = 1000ul;
-uint64_t const microsec_to_millisec = 1ul;
+uint64_t const millisec_to_hours    = 1000ul * 60ul * 60ul;
+uint64_t const millisec_to_minutes  = 1000ul * 60ul;
+uint64_t const millisec_to_seconds  = 1000ul;
 
 void print_time(std::chrono::milliseconds usec)
 {
   std::chrono::milliseconds::rep time = usec.count();
 
-  int const hours    = time / microsec_to_hours;    time -= hours    * microsec_to_hours;
-  int const minutes  = time / microsec_to_minutes;  time -= minutes  * microsec_to_minutes;
-  int const seconds  = time / microsec_to_seconds;  time -= seconds  * microsec_to_seconds;
-  int const millisec = time / microsec_to_millisec; time -= millisec * microsec_to_millisec;
+  int const hours    = time / millisec_to_hours;    time -= hours    * millisec_to_hours;
+  int const minutes  = time / millisec_to_minutes;  time -= minutes  * millisec_to_minutes;
+  int const seconds  = time / millisec_to_seconds;  time -= seconds  * millisec_to_seconds;
+  int const millisec = time;
 
   std::cout << fmt::format("Time: {:02d}:{:02d}:{:02d}'{:03d}\r", hours, minutes, seconds, millisec) << std::flush;
 }
