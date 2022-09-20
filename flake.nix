@@ -8,21 +8,25 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-      in rec {
-        packages = flake-utils.lib.flattenTree {
+      in {
+        packages = rec {
+          default = stopwatch;
+
           stopwatch = pkgs.stdenv.mkDerivation {
             pname = "stopwatch";
             version = "0.0.0";
+
             src = nixpkgs.lib.cleanSource ./.;
+
             nativeBuildInputs = with pkgs; [
               cmake
             ];
+
             buildInputs = with pkgs; [
-              fmt
+              fmt_8
             ];
            };
         };
-        defaultPackage = packages.stopwatch;
       }
     );
 }
